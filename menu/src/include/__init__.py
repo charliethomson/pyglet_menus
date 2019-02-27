@@ -2,17 +2,21 @@ from typing import Tuple, Union
 
 
 def col_comps_from_hex(hex_: str, alpha: bool = False) -> Tuple[int, int, int, int]:
-    """Returns the three int tuple with the r, g, b values from the `hex_` hex string"""
+    """Returns the four int tuple with the r, g, b, a values from the `hex_` hex string"""
     if not isinstance(hex_, str):
         if isinstance(hex_, int):
             hex_ = str(hex(hex_))
-    if hex_.startswith("0x"):
-        hex_ = hex_[2:]
+    hex_ = remove_0x(hex_)
+
     if not len(hex_) == 6:
-        if alpha:
+        if len(hex_) == 8:
+            pass
+        elif len(hex_) > 8:
             hex_ = hex_[:8]
-        else:
-            hex_ = hex_[:6]
+        elif len(hex_) < 8:
+            if len(hex_) < 6:
+                hex_.rjust(6, "0")
+            hex_.rjust(8, "F")
 
     r = int(hex_[0:2], 16)
     g = int(hex_[2:4], 16)
@@ -61,5 +65,6 @@ def hex_from_float(f: float) -> str:
 
 from .color import Color
 from .rect import Rect
+from .vector2d import Vector2D
 
-__all__ = ["Color", "Rect"]
+__all__ = ["Color", "Rect", "Vector2D"]

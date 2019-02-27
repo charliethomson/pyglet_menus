@@ -109,7 +109,7 @@ class Rect:
                 4,
                 GL_QUADS,
                 ("v2f", self.coords),
-                ("c3B", self.color.get_pyglet_colors(4)),
+                ("c3B", self.color.get_colors(4, 'c3B')),
             )
             # pprint(rectargs)
         else:
@@ -118,6 +118,6 @@ class Rect:
                 GL_QUADS,
                 None,
                 ("v2f", self.coords),
-                ("c3B", self.color.get_pyglet_colors(4)),
+                ("c3B", self.color.get_colors(4, 'c3B')),
             )
 

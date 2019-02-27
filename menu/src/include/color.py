@@ -4,10 +4,10 @@ from . import remove_0x, col_comps_from_hex, hex_from_float
 
 class Color:
     def __init__(self, r: int, g: int, b: int, a: int = 255):
-        self._r = r % 255
-        self._g = g % 255
-        self._b = b % 255
-        self._a = a % 255
+        self._r = r % 256
+        self._g = g % 256
+        self._b = b % 256
+        self._a = a % 256
 
     def __iter__(self):
         for comp in (self._r, self._g, self._b, self._a):
@@ -53,7 +53,7 @@ class Color:
         return self > other or self == other
 
     def __repr__(self):
-        return f"({self._r}, {self._g}, {self._b})"
+        return f"({self._r}, {self._g}, {self._b}, {self._a})"
 
     def __getitem__(self, item):
         return self.get(item)
@@ -169,8 +169,14 @@ class Color:
             errormsg = f"Unable to get item from {item}. Type mismatch {type(item)} not {int} or {str}"
             raise TypeError(errormsg)
 
-    def get_pyglet_colors(self, point_count: int) -> list:
-        return [self._r, self._g, self._b] * point_count
+    def get_colors(self, point_count: int, mode: str = "c3B") -> list:
+        if mode == "c3B":
+            return [self._r, self._g, self._b] * point_count
+        elif mode == "c4B":
+            return [self._r, self._g, self._b, self._a] * point_count
+        else:
+            errormsg = f"Invalid mode given '{mode}'. Must be 'c3B' or 'c4B'"
+            raise ValueError(errormsg)
 
     def to_rgba(self) -> list:
         return [i for i in self]
@@ -183,6 +189,10 @@ class Color:
         a = remove_0x(hex(self._a))
 
         return (
-            ("0x" if prefix else "") + r.upper() + g.upper() + b.upper() + (a.upper() if alpha else "")
+            ("0x" if prefix else "")
+            + r.upper()
+            + g.upper()
+            + b.upper()
+            + (a.upper() if alpha else "")
         )
 

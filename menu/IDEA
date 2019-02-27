@@ -1,0 +1,206 @@
+Menu:
+    Main menu class
+
+    Args:
+        id_:
+            str;
+            The menu id;
+    
+    kwargs:
+        batch:
+            pyglet.graphics.Batch;
+            An external batch to add the elements to;
+        logger:
+            logging.Logger;
+            A logging object to log with ;
+
+    Methods:
+        _log (lvl: int, msg: str) -> None:
+            if a logger was given, log `msg` at level `lvl`;
+
+        add_element (element: MenuElement (subclass)) -> None:
+            Add the element `element` to the menu;
+        
+        get_element_by_id (id_: str) -> MenuElement:
+            Get the element with the id `id_`;
+
+        on_mouse_motion (x: int, y: int) -> None:
+            set the mouse position to (x, y);
+
+        on_mouse_press (x: int, y: int, button: int, mod: int) -> None:
+            Handle button presses;
+        
+        draw (None) -> None:
+            Draw the menu;
+
+MenuElement:
+    Base class for all elements
+
+    Args:
+        id_:
+            str;
+            The id for the element;
+    
+    Kwargs:
+        None;
+
+    Methods:
+        get_yml_data (None) -> str:
+            returns a yaml string representative of the element
+
+        @classmethod
+        from_yml_str (yml_str: str) -> MenuElement:
+            returns a MenuElement from a yaml string provided by <MenuElement>.get_yml_data()
+
+Button:
+    Class for handling buttons
+
+    Args:
+        x:
+            int;
+            The x position of the button;
+        y:
+            int;
+            The y position of the button;
+        w:
+            int;
+            The width of the button;
+        h:
+            int;
+            The height of the button;
+        id_:
+            str;
+            The button's id;
+    
+    Kwargs:
+        text:
+            str;
+            def '';
+            The text on the button;
+        text_dpi:
+            int;
+            def 96;
+            The dpi of the text;
+        text_align:
+            str;
+            def 'center';
+            Horizontal alignment of text on a line. One of "left", "center" or "right";
+        anchor_x:
+            str;
+            def 'center';
+            Anchor point of the X coordinate, one of "left", "center" or "right";
+        anchor_y:
+            str;
+            def 'center';
+            Anchor point of the Y coordinate, one of "bottom", "baseline", "center" or "top";
+        text_color:
+            menu.src.include.Color;
+            def WHITE;
+            The color of the text;
+        font:
+            str;
+            def 'arial';
+            font family name;
+        font_size:
+            int;
+            def 12;
+            font size, in points;
+        background:
+            bool;
+            def True;
+            Whether or not there is a background drawn;
+        background_color:
+            menu.src.include.Color;
+            def DARK_GRAY;
+            What color to draw the background, if any;
+        visible:
+            bool;
+            def True;
+            Whether or not the button gets drawn;
+        clickable:
+            bool;
+            def True;
+            whether or not the button is clickable;
+        on_click:
+            typing.Tuple[typing.Callable, typing.Iterable] -> (func, (*args));
+            def None;
+            the func(*args) to execute when clicked;
+        logger:
+            logging.Logger;
+            def None:
+            The logger with which to log stuff with;
+    
+    Methods:
+        _log (lvl: int, msg: str) -> None:
+            If a logger was given, log `msg` to the logger with level `lvl`
+
+        update_data (refresh_label: bool = True, **items) -> None:
+            example items: {"color": WHITE, "batch": <Batch>}
+            would set <Button>.color to WHITE and <Button>.batch to <Batch>
+
+        contains (point: Vector2D) -> bool:
+            returns true if `point` is inside the button
+
+        draw (None) -> None:
+            Draws the button
+
+        on_click (func: Callable = None, args: Iterable = []) -> None:
+            If the button is not clickable, does nothing
+            if the button was given a function on initialisation, it executes that
+            otherwise it executes func(*args)
+        
+
+Color:
+    Args:
+        r:
+            int;
+            The red component of the color;
+        g:
+            int;
+            The green component of the color;
+        b:
+            int;
+            The blue component of the color;
+    
+    Kwargs:
+        a:
+            int;
+            def 255;
+            The alpha component of the color;
+    
+    Methods:
+        @classmethod
+        blend (col1: Color, col2: Color) -> Color:
+            returns the average color of col1 and col2
+            ex: 
+                col1 = (255, 0, 0); col2 = (0, 255, 0) -> (127, 127, 0)
+
+        @classmethod
+        from_hex (hex_: str) -> Color:
+            returns a color from the hex string `hex_`
+        
+        @classmethod
+        from_floats (r: float, g: float, b: float, a: float = 1.0) -> Color:
+            Returns a color from values 0.0 - 1.0
+            <Comp> = <Comp>hex / 255
+        
+        get (item: Union[int, str], hex_: bool = False, prefix: bool = True) -> str:
+            returns the item index of [r,g,b,a] if item is an int
+            returns (comp, comp, comp) for a multichar string
+                ex: 
+                    <Color>.get('rga') -> f"<Color>.r, <Color>.g, <Color.a>" 
+                    <Color>.get('rb', hex_=True, prefix=True) -> f"0x{hex(<Color>.r)}{hex(<Color>.b)}"
+
+        get_colors (point_count: int, mode: str = "c3B") -> list:
+            mode: one of "c3B" / "rgb" org "c4B" / "rgba" corresponding to the gl color attribute required
+            Returns a list with the right number of values for pyglet gl color attributes
+        
+        to_rgba () -> list:
+            returns a list of [<Color>.r ,<Color>.g ,<Color>.b ,<Color>.a]
+
+        to_hex (prefix: bool = False, alpha: bool = False) -> str:
+            returns a hex string of the color
+            if prefix, the hex will have and 0x prefix at the start
+            if alpha, the hex will have an alpha value as a part of it
+
+
