@@ -1,6 +1,6 @@
 from . import MenuElement, MENUS
-from typing import Dict, Type
-from .src.include import Vector2D
+from typing import Dict, Type 
+from .include import Vector2D
 from pyglet.graphics import Batch
 from logging import RootLogger, INFO, ERROR
 
@@ -29,6 +29,7 @@ class Menu:
     def mouse_pos(self, mouse_pos: Vector2D) -> None:
         if not isinstance(mouse_pos, Vector2D):
             errormsg = f"mouse_pos type mismatch: {type(mouse_pos)} != {Vector2D}"
+            self._log(ERROR, errormsg)
             raise TypeError(errormsg)
 
         self._mouse_pos = mouse_pos
@@ -38,7 +39,7 @@ class Menu:
         errormsg = (
             f"<Menu>.mouse_pos cannot be deleted without deleting the entire object"
         )
-        self._log
+        self._log(ERROR, errormsg)
         raise AttributeError(errormsg)
 
     @property
@@ -48,11 +49,13 @@ class Menu:
     @id.setter
     def id(self, _):
         errormsg = f"<Menu>.id is a read-only attribute"
+        self._log(ERROR, errormsg)
         raise AttributeError(errormsg)
 
     @id.deleter
     def id(self):
         errormsg = f"<Menu>.id cannot be deleted without deleting the entire object"
+        self._log(ERROR, errormsg)
         raise AttributeError(errormsg)
 
     @property
@@ -62,6 +65,7 @@ class Menu:
     @elements.setter
     def elements(self, _):
         errormsg = f"<Menu>.elements is a read-only attribute"
+        self._log(ERROR, errormsg)
         raise AttributeError(errormsg)
 
     @elements.deleter
@@ -75,9 +79,11 @@ class Menu:
     def add_element(self, element: Type[MenuElement]) -> None:
         if not isinstance(element, MenuElement):
             errormsg = f"Unable to add element of type {type(element)} to {self._id}"
+            self._log(ERROR, errormsg)
             raise TypeError(errormsg)
         elif element.id in self._elements:
             errormsg = f"Element with id {element.id} already in {self._id}"
+            self._log(ERROR, errormsg)
             raise KeyError(errormsg)
 
         element.update_data(_batch=self._batch)
@@ -91,6 +97,7 @@ class Menu:
     def get_element_by_id(self, id_: str) -> MenuElement:
         if id_ not in list(self._elements.keys()):
             errormsg = f"No element found with id {id_} in menu {self.id}"
+            self._log(ERROR, errormsg)
             raise ValueError(errormsg)
 
         else:
@@ -120,13 +127,13 @@ class Menu:
 
         if not "id" in yml_d and "elements" in yml_d:
             missing = ", ".join([i for i in ["id", "elements"] if i not in yml_d])
-            errormsg = f"Missing attribute{'s ' + missing if ',' in missing else ' '}. Unable to create menu object from file {filename}"
+            errormsg = f"Missing attribute{'s ' + missing if ',' in missing else missing}. Unable to create menu object from file {filename}"
             raise AttributeError(errormsg)
 
         menu = cls(yml_d["id"])
-
-        for item in yml_d["elements"]:
-            type_, data = yml_d["elements"][item]
+        elements = yml_d["elements"]
+        for item in elements:
+            type_, data = elements[item]
             menu.add_element(type_._from_attribs(data))
         
         

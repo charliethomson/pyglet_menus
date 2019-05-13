@@ -59,7 +59,7 @@ class Color:
         return self.get(item)
 
     @classmethod
-    def blend(self, col1, col2):
+    def blend(cls, col1, col2):
         """
         Returns a new color as the average of self and other
         """
@@ -125,8 +125,8 @@ class Color:
 
     def get(self, item, hex_: bool = False, prefix: bool = True) -> str:
         if isinstance(item, slice):
-            errormsg = "Colors do not support slices. If you want more than one value,"
-            errormsg += " index with a string with the components you're looking for"
+            errormsg = "Colors do not support slices. If you want more than one value," + \
+                       " index with a string with the components you're looking for"
             raise IndexError(errormsg)
 
         elif isinstance(item, int):

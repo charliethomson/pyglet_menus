@@ -154,32 +154,29 @@ class Button(MenuElement):
     def update_data(
         self, refresh_label: bool = True, refresh_background: bool = True, **items
     ):
-        for k in items:
-            if k in self.__dict__:
-                self._log(
-                    INFO,
-                    f"changed Button with id value {self._id} value {k}: {self.__dict__[k]} -> {items[k]}",
-                )
-                self.__dict__[k] = items[k]
-            elif any((k in self._label_data, k in self._background_box_data)):
+        for k, v in items:
+            
+            if k in self._label_data or k in self._background_box_data:
                 if k in self._label_data:
                     self._log(
                         INFO,
-                        f"changed Button with id value {self._id} label data value {k}: {self._label_data[k]} -> {items[k]}; Forcing a refresh of label data",
+                        f"changed Button with id value {self._id} label data value {k}: {self._label_data[k]} -> {v}; Forcing a refresh of label data",
                     )
-                    self._label_data[k] = items[k]
+                    self._label_data[k] = v
                     refresh_label = True
                 if k in self._background_box_data:
                     self._log(
-                        INFO,
-                        f"changed Button with id value {self._id} background data value {k}: {self._label_data[k]} -> {items[k]}; Forcing a refresh of background data",
+                        INFO, 
+                        f"changed Button with id value {self._id} background data value {k}: {self._background_box_data[k]} -> {v}; Forcing a refresh of background data",
                     )
-                    self._background_box_data[k] = items[k]
-                    refresh_background = False
+                    self._background_box_data[k] = v
+                    refresh_background = True
             else:
-                errormsg = f"Failed to update item {k} to {items[k]} on Button with id {self.id}"
-                self._log(ERROR, errormsg)
-                raise KeyError(errormsg)
+                res = super().update_data((k, v))
+                if res.is_err():
+                    errormsg = f"Failed to update item {k} to {v} on Button with id {self.id} -> {res.err}"
+                    self._log(ERROR, errormsg)
+                    raise KeyError(errormsg)
 
         if refresh_label:
             self._log(INFO, f"Refreshing label data")
@@ -199,6 +196,7 @@ class Button(MenuElement):
         )
 
     def draw(self) -> None:
+        self._log(DEBUG, f"<Button>.draw called on button {self.id},")
         if self._visible:
             if not isinstance(self._batch, Batch):
                 if self._background:
@@ -212,8 +210,6 @@ class Button(MenuElement):
                         id_=f"{self.id} Background",
                     )
                 self._label.draw()
-        else:
-            self._log(DEBUG, f"<Button>.draw called on button {self.id},")
 
     def on_click(self, func: Callable = None, args: Iterable = []) -> None:
         if not self._clickable:
